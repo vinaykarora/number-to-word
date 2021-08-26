@@ -47,6 +47,9 @@ namespace NumberToWords.Tests
             output = NumberToWords.Converter.ConvertToWords(1234567.78);
             Assert.Equal("one million two hundred thirty-four thousand five hundred sixty-seven dollars and seventy-eight cents", output.ToLower());
 
+            output = NumberToWords.Converter.ConvertToWords(1357256.32);
+            Assert.Equal("one million three hundred fifty-seven thousand two hundred fifty-six dollars and thirty-two cents", output.ToLower());
+
             output = NumberToWords.Converter.ConvertToWords(999999999.99);
             Assert.Equal("nine hundred ninety-nine million nine hundred ninety-nine thousand nine hundred ninety-nine dollars and ninety-nine cents", output.ToLower());
         }
