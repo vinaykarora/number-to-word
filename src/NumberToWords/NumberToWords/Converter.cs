@@ -13,7 +13,7 @@ namespace NumberToWords
     public static class Converter
     {
         private static ConcurrentDictionary<string, Type> _convertersMetadataMap;
-        
+        private static SimpleMemoryCache<Type, INumberToWordsConverter> _convertersCache;
         public static void Initialize(params Assembly[] assemblies)
         {
             if (assemblies is null)
@@ -27,6 +27,7 @@ namespace NumberToWords
             }
 
             _convertersMetadataMap = new ConcurrentDictionary<string, Type>();
+            _convertersCache = new SimpleMemoryCache<Type, INumberToWordsConverter>();
 
             var converterTypes = assemblies.SelectMany(x => x.ExportedTypes)
                .Where(x => typeof(INumberToWordsConverter).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
@@ -55,7 +56,10 @@ namespace NumberToWords
                 throw new NotImplementedException($"The NumberToWords Converter for the '{options.LanguageCode}' Not Implemented.");
             }
             var converterType = _convertersMetadataMap[options.LanguageCode];
-            var converter = (INumberToWordsConverter)Activator.CreateInstance(converterType);
+            var converter = _convertersCache.GetOrCreate(converterType, () =>
+            {
+                return (INumberToWordsConverter)Activator.CreateInstance(converterType);
+            });
 
             return converter.ConvertToWords(number, options);
         }
